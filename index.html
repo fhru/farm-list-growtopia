@@ -2,12 +2,17 @@
 <html>
 
 <head>
-    <title>List Farm</title>
+    <title>Lgrid Farm List | by Yb</title>
     <link href="https://www.dafontfree.net/embed/Y2VudHVyeS1nb3RoaWMtYm9sZCZkYXRhLzQ3L2MvNTA3NjIvZ290aGljYi50dGY"
         rel="stylesheet" type="text/css" />
     <style>
+        body {
+            background-color: #1d1d1d;
+        }
+
         * {
             font-family: 'century-gothic-bold', sans-serif;
+            color: white;
         }
 
         /* Gaya untuk div wadah */
@@ -82,6 +87,22 @@
             font-size: 64px;
             margin-bottom: -20px;
         }
+
+        .button {
+            background-color: #3c7be7;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        input {
+            color: black;
+            font-size: 16px;
+            border-radius: 6px;
+            padding: 5px;
+            outline: none;
+        }
     </style>
 </head>
 
@@ -91,14 +112,13 @@
         <h5>By <a href="https://github.com/fhru" target="_blank">Yb</a></h5>
         <form onsubmit="tambahNilai(event)">
             <input type="text" id="inputValue" required>
-            <button type="submit">Tambah World</button>
+            <button type="submit" class="button">Tambah World</button>
         </form>
-        <button onclick="sortList()" style="margin-top: 10px;">Ready Worlds</button>
         <div>
-            <p id="counter">Total World: 0</p>
-            <button onclick="resetCounter()">Reset World</button>
-
+            <button onclick="resetCounter()" class="button">Reset World</button>
+            <button onclick="sortList()" style="margin-top: 10px;" class="button">Sort Ready World</button>
         </div>
+        <p id="counter">Total World: 0</p>
 
     </div>
     <div id="listContainer">
