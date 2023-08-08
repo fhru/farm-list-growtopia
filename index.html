@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simpan Nilai ke Local Storage</title>
+    <link href="https://www.dafontfree.net/embed/Y2VudHVyeS1nb3RoaWMtYm9sZCZkYXRhLzQ3L2MvNTA3NjIvZ290aGljYi50dGY"
+        rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            font-family: 'century-gothic-bold', sans-serif;
+        }
+
+        /* Gaya untuk div wadah */
+        #listContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Gaya untuk tiap nilai */
+        .valueItem {
+            background-color: #fed804;
+            padding: 15px;
+            margin: 5px;
+            border-radius: 10px;
+            font-size: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .reset-button {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .delete-button {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .ready-button {
+            background-color: #3c7be7;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .sort-button {
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            font-size: 64px;
+            margin-bottom: -20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Lgrid Farm List</h1>
+        <h5>By <a href="https://github.com/fhru" target="_blank">Yb</a></h5>
+        <form onsubmit="tambahNilai(event)">
+            <input type="text" id="inputValue" required>
+            <button type="submit">Tambah World</button>
+        </form>
+        <button onclick="sortList()" style="margin-top: 10px;">Ready Worlds</button>
+        <div>
+            <p id="counter">Total World: 0</p>
+            <button onclick="resetCounter()">Reset World</button>
+
+        </div>
+
+    </div>
+    <div id="listContainer">
+        <!-- Daftar nilai akan ditampilkan di sini -->
+    </div>
+
+    <script>
+        let counter = parseInt(localStorage.getItem('counter')) || 0;
+
+        function showCount() {
+            const counterElement = document.getElementById('counter');
+            counterElement.textContent = `Total World: ${counter}`;
+        }
+
+        function resetCounter() {
+            counter = 0;
+            localStorage.setItem('counter', counter);
+            showCount();
+
+            // Clear all stored values from local storage
+            localStorage.removeItem('values');
+            // Call the function to show the updated list (empty list)
+            showValuesFromLocalStorage();
+        }
+
+
+
+        // Fungsi untuk menampilkan daftar nilai dari local storage
+        function showValuesFromLocalStorage() {
+            const listValuesElement = document.getElementById('listValues');
+            listValuesElement.innerHTML = ''; // Kosongkan daftar nilai sebelumnya
+
+            // Ambil nilai dari local storage (jika ada)
+            const storedValues = JSON.parse(localStorage.getItem('values')) || [];
+
+            // Tampilkan nilai dalam bentuk list
+            storedValues.forEach((value, index) => {
+                const li = createListItem(value.text, value.timeAdded, index);
+                listValuesElement.appendChild(li);
+            });
+            showCount();
+        }
+
+        // Fungsi untuk membuat list item dengan timer
+        function createListItem(text, timeAdded, index) {
+            const li = document.createElement('li');
+            li.textContent = text;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Hapus';
+            deleteButton.onclick = function () {
+                hapusNilai(index);
+            };
+
+            const resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset';
+            resetButton.onclick = function () {
+                resetTimer(li);
+            };
+
+            li.appendChild(deleteButton);
+            li.appendChild(resetButton);
+
+            li.dataset.timeAdded = timeAdded;
+            updateColor(li); // Perbarui warna teks sesuai waktu
+
+            return li;
+        }
+
+        // Fungsi untuk menambah nilai ke local storage dan memperbarui tampilan list
+        function tambahNilai() {
+            event.preventDefault();
+            counter++;
+            const inputValue = document.getElementById('inputValue').value;
+            if (inputValue.trim() !== '') {
+                // Ambil nilai yang sudah ada di local storage (jika ada)
+                const storedValues = JSON.parse(localStorage.getItem('values')) || [];
+
+                // Tambahkan nilai baru dengan waktu saat ditambahkan
+                const newValue = {
+                    text: inputValue,
+                    timeAdded: Date.now(),
+                };
+                storedValues.push(newValue);
+
+                // Simpan kembali nilai ke local storage
+                localStorage.setItem('values', JSON.stringify(storedValues));
+
+                // Perbarui tampilan list
+                showValuesFromLocalStorage();
+
+                // Kosongkan input setelah nilai ditambahkan
+                document.getElementById('inputValue').value = '';
+            }
+            if (inputValue === '') {
+                alert('Cannot be Empty!.');
+                return;
+            }
+            // Update counter in local storage
+            localStorage.setItem('counter', counter);
+            showCount();
+        }
+
+        // Fungsi untuk menghapus nilai dari local storage berdasarkan index
+        function hapusNilai(index) {
+            counter--;
+
+            const storedValues = JSON.parse(localStorage.getItem('values')) || [];
+            if (index >= 0 && index < storedValues.length) {
+                storedValues.splice(index, 1);
+                localStorage.setItem('values', JSON.stringify(storedValues));
+
+                // Perbarui tampilan list
+                showValuesFromLocalStorage();
+            }
+            // Update counter in local storage
+            localStorage.setItem('counter', counter);
+            showCount();
+        }
+
+        // Fungsi untuk me-reset timer untuk setiap nilai
+        function resetTimer(li) {
+            li.dataset.timeAdded = Date.now();
+            li.style.color = 'black';
+            updateColor(li); // Mulai timer lagi setelah di-reset
+        }
+
+        // Fungsi untuk memeriksa dan memperbarui warna teks berdasarkan waktu berlalu
+        function updateColor(li) {
+            const timeAdded = parseInt(li.dataset.timeAdded);
+            const elapsedTime = Math.floor((Date.now() - timeAdded) / 1000);
+
+            if (elapsedTime >= 30) {
+                li.style.color = 'green';
+                li.style.backgroundColor = 'lightgreen';
+            } else {
+                li.style.color = 'black';
+                setTimeout(() => updateColor(li), 1000); // Perbarui warna setiap detik
+            }
+        }
+
+        // Fungsi untuk menampilkan daftar nilai dari local storage
+        function showValuesFromLocalStorage() {
+            const listContainer = document.getElementById('listContainer');
+            listContainer.innerHTML = ''; // Kosongkan daftar nilai sebelumnya
+
+            // Ambil nilai dari local storage (jika ada)
+            const storedValues = JSON.parse(localStorage.getItem('values')) || [];
+
+            // Tampilkan nilai dalam bentuk div
+            storedValues.forEach((value, index) => {
+                const valueDiv = createValueDiv(value.text, value.timeAdded, index);
+                listContainer.appendChild(valueDiv);
+            });
+        }
+
+        // Fungsi untuk membuat div item dengan timer dan tombol reset
+        function createValueDiv(text, timeAdded, index) {
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'valueItem';
+            valueDiv.textContent = text;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Hapus';
+            deleteButton.className = 'delete-button'; // Menggunakan class CSS .delete-button
+            deleteButton.onclick = function () {
+                hapusNilai(index);
+            };
+
+            const resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset';
+            resetButton.className = 'reset-button';
+            resetButton.onclick = function () {
+                resetTimer(valueDiv);
+                valueDiv.style.backgroundColor = 'yellow';
+            };
+
+            const readyButton = document.createElement('button');
+            readyButton.textContent = 'Ready';
+            readyButton.className = 'ready-button';
+            readyButton.onclick = function () {
+                stopTimer(valueDiv);
+                valueDiv.style.backgroundColor = 'lightgreen';
+            };
+
+            valueDiv.appendChild(deleteButton);
+            valueDiv.appendChild(resetButton);
+            valueDiv.appendChild(readyButton);
+
+            valueDiv.dataset.timeAdded = timeAdded;
+            updateColor(valueDiv); // Perbarui warna teks sesuai waktu
+
+            return valueDiv;
+        }
+
+        function stopTimer(li) {
+            li.style.color = 'green';
+            li.style.backgroundColor = 'lightgreen';
+            clearTimeout(li.timerId); // Hentikan timeout yang sedang berjalan
+        }
+
+        function sortList() {
+            const listContainer = document.getElementById('listContainer');
+            const listItems = Array.from(listContainer.children);
+
+            // Sort the list items based on the background color (green first)
+            listItems.sort((a, b) => {
+                const aIsGreen = a.style.backgroundColor === 'lightgreen';
+                const bIsGreen = b.style.backgroundColor === 'lightgreen';
+
+                if (aIsGreen && !bIsGreen) return -1;
+                if (!aIsGreen && bIsGreen) return 1;
+                return 0;
+            });
+
+            // Clear the existing list
+            listContainer.innerHTML = '';
+
+            // Re-add the sorted list items
+            listItems.forEach((item) => listContainer.appendChild(item));
+        }
+
+
+        // Panggil fungsi untuk menampilkan daftar nilai saat halaman pertama kali dimuat
+        showValuesFromLocalStorage();
+    </script>
+</body>
+
+</html>
